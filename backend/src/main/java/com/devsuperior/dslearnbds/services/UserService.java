@@ -19,12 +19,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService implements UserDetailsService {
 
     @Autowired
-    public UserRepository repository;
+    private UserRepository repository;
+	
+	@Autowired
+	private AuthService authService;
 
     private static Logger logger = org.slf4j.LoggerFactory.getLogger(UserService.class);
 
     @Transactional(readOnly = true)
 	public UserDTO findById(Long id) {
+		authService.validateSelfOrAdmin(id);
 		Optional<User > obj = repository.findById(id);
 		User  entity = obj.orElseThrow(() -> new ResourceNotFoundException("Entity not found"));
 		return new UserDTO(entity);
